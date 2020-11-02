@@ -1,0 +1,20 @@
+{
+  "name": "xfern",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "repository": "git@github.com:stak-digital/xfern.git",
+  "author": "Stak Digital",
+  "license": "MPL-2.0",
+  "private": false,
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.5"
+  },
+  "devDependencies": {
+    "prettier": "^2.1.2"
+  }
+}
+
