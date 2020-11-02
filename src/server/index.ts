@@ -5,6 +5,7 @@ export const boot = () => {
   const port = 3000;
 
   app.use("/media", express.static("media"));
+  app.use("/public", express.static("src/server/public"));
 
   app.get("/", (req, res) => {
     res.sendFile(join(process.cwd(), "src", "server", "index.html"));
