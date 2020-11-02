@@ -11,6 +11,8 @@ This project is licensed under the [Mozilla Public License 2.0](https://chooseal
 
 See the `LICENSE` file for more.
 
+`media/drums.wav` sample file by `alexround` via [freesound](https://freesound.org/people/alexround/sounds/538087/).
+
 ## How to use xfern
 
 The ideal use-case is:
