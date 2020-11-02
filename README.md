@@ -26,7 +26,9 @@ xfern supports a great event-based plugin system where you can build your own in
 functionality. 
 
 Want automatically-downloaded album art? Make a plugin! 
+
 Want `last.fm` tracking? *Make a plugin!!*
+
 Want visual lyrics sync? **Make a plugin!!!**
 
 ## xfern philosophy
