@@ -1,7 +1,8 @@
 import { readdir } from "fs/promises";
 import { join } from "path";
+import { boot } from "./server";
 
-console.log("Booting xfern 🌿");
+console.log("Welcome to xfern 🌿");
 
 const getMedia = async (): Promise<Array<string>> => {
   const result = await readdir(join(process.cwd(), "media"));
@@ -13,4 +14,6 @@ const getMedia = async (): Promise<Array<string>> => {
   const mediaFiles = await getMedia();
   console.log(`Found ${mediaFiles.length} media files:`);
   console.log(JSON.stringify(mediaFiles, null, 2));
+  console.log("Booting server - please wait...");
+  boot();
 })();
