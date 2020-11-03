@@ -33,9 +33,7 @@ export const boot = () => {
     const results = await getMedia();
     const mediaFiles = results.map(
       (file) =>
-        `http://localhost:${port}/media/${file
-          .replace(process.cwd(), "")
-          .replace("/media/", "")}`
+        `/media/${file.replace(process.cwd(), "").replace("/media/", "")}`
     );
     res.json(mediaFiles);
   });
