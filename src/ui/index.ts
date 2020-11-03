@@ -4,7 +4,6 @@ export const boot = () => {
   const app = express();
   const port = 3000;
 
-  app.use("/media", express.static("media"));
   app.use("/public", express.static("src/ui/public"));
 
   app.get("/", (req, res) => {
@@ -12,6 +11,6 @@ export const boot = () => {
   });
 
   app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`UI Server listening at http://localhost:${port}`);
   });
 };

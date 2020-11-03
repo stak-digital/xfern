@@ -1,19 +1,13 @@
 import { readdir } from "fs/promises";
 import { join } from "path";
-import { boot } from "./ui";
+import { boot as bootUI } from "./ui";
+import { boot as bootAPI } from "./api";
 
 console.log("Welcome to xfern 🌿");
 
-const getMedia = async (): Promise<Array<string>> => {
-  const result = await readdir(join(process.cwd(), "media"));
-  return result.map((filename) => join(process.cwd(), "media", filename));
-};
-
 (async () => {
-  console.log("Reading /media/* for files...");
-  const mediaFiles = await getMedia();
-  console.log(`Found ${mediaFiles.length} media files:`);
-  console.log(JSON.stringify(mediaFiles, null, 2));
-  console.log("Booting ui - please wait...");
-  boot();
+  console.log("Booting UI server - please wait...");
+  bootUI();
+  console.log("Booting API server - please wait...");
+  bootAPI();
 })();
