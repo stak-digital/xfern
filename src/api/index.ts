@@ -2,9 +2,23 @@ import express from "express";
 import { join } from "path";
 import cors from "cors";
 import { readdir } from "fs/promises";
+import glob from "glob";
 
 const getMedia = async (): Promise<Array<string>> => {
-  return readdir(join(process.cwd(), "media"));
+  return new Promise((resolve, reject) => {
+    glob(
+      join(process.cwd(), "media", "**/**.*(mp3|wav)"),
+      { dot: false },
+      (err, matches) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(matches);
+      }
+    );
+  });
 };
 
 export const boot = () => {
@@ -16,8 +30,12 @@ export const boot = () => {
   app.use("/media", express.static("media"));
 
   app.get("/media/query", async (req, res) => {
-    const mediaFiles = (await getMedia()).map(
-      (file) => `http://localhost:${port}/media/${file}`
+    const results = await getMedia();
+    const mediaFiles = results.map(
+      (file) =>
+        `http://localhost:${port}/media/${file
+          .replace(process.cwd(), "")
+          .replace("/media/", "")}`
     );
     res.json(mediaFiles);
   });

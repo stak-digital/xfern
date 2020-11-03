@@ -14,3 +14,7 @@ body {
     background: var(--color-background);
     color: var(--color-foreground)
 }
+
+.xf-track-select-wrapper {
+    display: block;
+}
