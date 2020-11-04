@@ -53,3 +53,21 @@ main {
     padding: 1rem;
     -webkit-appearance: none;
 }
+
+.xf-play-or-pause {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font-size: 0;
+}
+
+.xf-play-or-pause::before {
+    font-size: 2rem;
+}
+
+.xf-play-or-pause[data-state="paused"]::before {
+    content: '▶'
+}
+
+.xf-play-or-pause[data-state="playing"]::before {
+    content: '⏸'
+}

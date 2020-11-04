@@ -3,6 +3,7 @@
 const $ = (s) => document.querySelector(s);
 
 const domain = window.location.hostname;
+const audio = $(".xf-player");
 
 const setTrack = (mediaUrl) => {
   $(".xf-player").setAttribute("src", `http://${domain}:3001${mediaUrl}`);
@@ -26,13 +27,6 @@ const setQueue = (files) => {
 
   [...select.children].forEach((n) => n.remove());
 
-  // for (const childNode of select.children) {
-  //   console.log("removing ", childNode.innerHTML);
-  //   childNode.parentNode.removeChild(childNode);
-  // }
-
-  console.log({ files });
-
   files.forEach((file) => {
     const o = document.createElement("button");
     o.classList.add("xf-track-select-button");
@@ -53,3 +47,24 @@ fetch(`http://${domain}:3001/media/all`)
   });
 
 $(".xf-search-box").addEventListener("input", (e) => doSearch(e.target.value));
+
+audio.addEventListener("pause", (e) => {
+  $(".xf-play-or-pause").dataset.state = "paused";
+});
+
+audio.addEventListener("play", (e) => {
+  $(".xf-play-or-pause").dataset.state = "playing";
+});
+
+$(".xf-play-or-pause").addEventListener("click", (e) => {
+  /**
+   * @type {HTMLAudioElement}
+   */
+  const { dataset } = e.target;
+
+  if (dataset.state === "playing") {
+    audio.pause();
+  } else {
+    audio.play();
+  }
+});
