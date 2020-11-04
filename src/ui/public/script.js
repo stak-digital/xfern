@@ -10,20 +10,46 @@ const setTrack = (mediaUrl) => {
   $(".xf-current-track-name").innerText = fileName;
 };
 
-fetch(`http://${domain}:3001/media/query`)
+const doSearch = async (q) => {
+  const results = await fetch(
+    `http://${domain}:3001/media/search?q=${q}`
+  ).then((res) => res.json());
+
+  setQueue(results);
+};
+
+const setQueue = (files) => {
+  /**
+   * @type {HTMLElement}
+   */
+  const select = $(".xf-track-select");
+
+  [...select.children].forEach((n) => n.remove());
+
+  // for (const childNode of select.children) {
+  //   console.log("removing ", childNode.innerHTML);
+  //   childNode.parentNode.removeChild(childNode);
+  // }
+
+  console.log({ files });
+
+  files.forEach((file) => {
+    const o = document.createElement("button");
+    o.classList.add("xf-track-select-button");
+    o.setAttribute("data-value", file);
+    o.innerText = file;
+    o.onclick = () => setTrack(file);
+    console.log("adding", file);
+    select.appendChild(o);
+  });
+};
+
+fetch(`http://${domain}:3001/media/all`)
   .then((res) => res.json())
   .then((files) => {
-    const select = $(".xf-track-select");
     const firstFile = files[0];
-
     setTrack(firstFile);
-
-    files.forEach((file) => {
-      const o = document.createElement("button");
-      o.classList.add("xf-track-select-button");
-      o.setAttribute("data-value", file);
-      o.innerText = file;
-      o.onclick = () => setTrack(file);
-      select.appendChild(o);
-    });
+    setQueue(files);
   });
+
+$(".xf-search-box").addEventListener("input", (e) => doSearch(e.target.value));

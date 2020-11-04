@@ -1,7 +1,6 @@
 import express from "express";
 import { join } from "path";
 import cors from "cors";
-import { readdir } from "fs/promises";
 import glob from "glob";
 
 const getMedia = async (): Promise<Array<string>> => {
@@ -21,22 +20,35 @@ const getMedia = async (): Promise<Array<string>> => {
   });
 };
 
-export const boot = () => {
+const makeFilePath = (file) => {
+  return `/media/file/${file
+    .replace(process.cwd(), "")
+    .replace("/media/", "")}`;
+};
+
+export const boot = async () => {
   const app = express();
   const port = 3001;
+  let media = [];
 
   app.use(cors());
 
-  app.use("/media", express.static("media"));
+  app.use("/media/file", express.static("media"));
 
-  app.get("/media/query", async (req, res) => {
-    const results = await getMedia();
-    const mediaFiles = results.map(
-      (file) =>
-        `/media/${file.replace(process.cwd(), "").replace("/media/", "")}`
-    );
+  app.get("/media/all", async (req, res) => {
+    const mediaFiles = media.map(makeFilePath);
     res.json(mediaFiles);
   });
+
+  app.get("/media/search", async (req, res) => {
+    const search = req.query.q as string;
+    const matches = media
+      .filter((file) => file.toLowerCase().includes(search.toLocaleLowerCase()))
+      .map(makeFilePath);
+    res.json(matches);
+  });
+
+  media = await getMedia();
 
   app.listen(port, () => {
     console.log(`API Server listening at http://localhost:${port}`);
