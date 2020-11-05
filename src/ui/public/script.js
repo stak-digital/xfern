@@ -5,10 +5,12 @@ const $ = (s) => document.querySelector(s);
 const domain = window.location.hostname;
 const audio = $(".xf-player");
 
-const setTrack = (mediaUrl) => {
-  $(".xf-player").setAttribute("src", `http://${domain}:3001${mediaUrl}`);
-  const fileName = mediaUrl.replace(`/media/`, "");
-  $(".xf-current-track-name").innerText = fileName;
+const setTrack = (mediaObject) => {
+  $(".xf-player").setAttribute(
+    "src",
+    `http://${domain}:3001${mediaObject.file}`
+  );
+  $(".xf-current-track-name").innerText = getTrackName(mediaObject);
 };
 
 const doSearch = async (q) => {
@@ -17,6 +19,21 @@ const doSearch = async (q) => {
   ).then((res) => res.json());
 
   setQueue(results);
+};
+
+const getTrackName = (file) => {
+  const { title, artist } = file.meta.common;
+  const filename = file.file;
+
+  if (title && artist) {
+    return `${title} - ${artist}`;
+  }
+
+  if (title || artist) {
+    return title || artist;
+  }
+
+  return filename.split("/").reverse()[0];
 };
 
 const setQueue = (files) => {
@@ -30,9 +47,13 @@ const setQueue = (files) => {
   files.forEach((file) => {
     const o = document.createElement("button");
     o.classList.add("xf-track-select-button");
-    o.setAttribute("data-value", file);
-    o.innerText = file;
-    o.onclick = () => setTrack(file);
+    o.setAttribute("data-value", file.file);
+    o.innerText = getTrackName(file);
+    o.onclick = () => {
+      audio.pause();
+      setTrack(file);
+      audio.play();
+    };
     console.log("adding", file);
     select.appendChild(o);
   });

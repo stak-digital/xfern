@@ -52,6 +52,18 @@ main {
     width: 100%;
     padding: 1rem;
     -webkit-appearance: none;
+    -moz-appearance: none;
+    font: inherit;
+    background: transparent;
+    border: none;
+    color: currentColor;
+    cursor: pointer;
+    text-align: left;
+}
+
+.xf-track-select-button:hover {
+    background: var(--color-foreground);
+    color: var(--color-background);
 }
 
 .xf-play-or-pause {
