@@ -74,12 +74,13 @@ main {
 
 .xf-play-or-pause::before {
     font-size: 2rem;
+    content: '▶ / ⏸'
 }
 
-.xf-play-or-pause[data-state="paused"]::before {
-    content: '▶'
-}
+/*.xf-play-or-pause[data-state="paused"]::before {*/
+/*    content: '▶'*/
+/*}*/
 
-.xf-play-or-pause[data-state="playing"]::before {
-    content: '⏸'
-}
+/*.xf-play-or-pause[data-state="playing"]::before {*/
+/*    content: '⏸'*/
+/*}*/
