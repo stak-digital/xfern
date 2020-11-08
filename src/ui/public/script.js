@@ -14,29 +14,56 @@ const EVENT_NAMES = {
   TRACK_START: "track-start",
 };
 
-new Vue({
+window.zz = new Vue({
   el: ".xf-root",
-  data: {
-    media: [],
-    currentTrack: null,
-    playerState: "paused", // todo: can we just detect this on-demand instead of manually tracking?
-    libraryView: LIBRARY_VIEWS.TRACKS,
-    constants: {
-      LIBRARY_VIEWS,
-    },
+  data: () => {
+    const initialState = {
+      media: [],
+      currentTrack: null,
+      playerState: "paused", // todo: can we just detect this on-demand instead of manually tracking?
+      libraryView: LIBRARY_VIEWS.TRACKS,
+      constants: {
+        LIBRARY_VIEWS,
+      },
+    };
+
+    try {
+      let storedState = localStorage.getItem("view_state");
+      if (storedState) {
+        storedState = JSON.parse(storedState);
+      }
+
+      Object.assign(initialState, storedState);
+    } catch (e) {
+      console.error(e);
+      // eh who cares
+    }
+
+    return initialState;
   },
   mounted() {
     fetch(`http://${domain}:3001/media/all`)
       .then((res) => res.json())
       .then((files) => {
-        const firstFile = files[0];
-        this.setTrack(firstFile);
+        if (!this.currentTrack) {
+          const firstFile = files[0];
+          this.setTrack(firstFile);
+        }
         this.setQueue(files);
       });
 
     // todo: add removeEventListener on unmount
     this.$refs.audio.addEventListener("play", this.handlePlayerStateChanged);
     this.$refs.audio.addEventListener("pause", this.handlePlayerStateChanged);
+
+    // todo: there must be a better way to cache page state before page destroy
+    setInterval((event) => {
+      const { currentTrack, playerState, libraryView } = this.$data;
+      localStorage.setItem(
+        "view_state",
+        JSON.stringify({ currentTrack, playerState, libraryView })
+      );
+    }, 5000);
   },
   methods: {
     sendEvent(eventName, meta) {

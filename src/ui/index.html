@@ -32,10 +32,10 @@
                     <h3>Select track:</h3>
                     <div class="xf-track-select">
                         <button
-                                :data-is-current-track="track === currentTrack"
                                 v-for="track in mediaByView"
                                 class="xf-track-select-button"
-                                v-bind:data-value="track.file"
+                                :data-is-current-track="track.file === currentTrack.file"
+                                :data-value="track.file"
                                 v-on:click="handleTrackButtonPressed(track)"
                         >{{ getTrackName(track) }}
                         </button>
