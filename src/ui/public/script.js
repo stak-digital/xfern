@@ -4,12 +4,26 @@ const $ = (s) => document.querySelector(s);
 const domain = window.location.hostname;
 const audio = $(".xf-player");
 
+const LIBRARY_VIEWS = {
+  TRACKS: "Tracks",
+  ARTISTS: "Artists",
+  ALBUMS: "Albums",
+};
+
+const EVENT_NAMES = {
+  TRACK_START: "track-start",
+};
+
 new Vue({
   el: ".xf-root",
   data: {
     media: [],
     currentTrack: null,
     playerState: "paused", // todo: can we just detect this on-demand instead of manually tracking?
+    libraryView: LIBRARY_VIEWS.TRACKS,
+    constants: {
+      LIBRARY_VIEWS,
+    },
   },
   mounted() {
     fetch(`http://${domain}:3001/media/all`)
@@ -25,6 +39,19 @@ new Vue({
     this.$refs.audio.addEventListener("pause", this.handlePlayerStateChanged);
   },
   methods: {
+    sendEvent(eventName, meta) {
+      fetch(`http://${domain}:3001/event`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: eventName,
+          data: meta,
+        }),
+      });
+    },
     handlePlayerStateChanged() {
       this.$data.playerState = this.$refs.audio.paused ? "paused" : "playing";
     },
@@ -38,6 +65,7 @@ new Vue({
     },
     setTrack(mediaObject) {
       this.currentTrack = mediaObject;
+      this.sendEvent(EVENT_NAMES.TRACK_START, { track: mediaObject });
     },
     handleTrackButtonPressed(track) {
       // audio crashes if not paused before change
@@ -91,6 +119,13 @@ new Vue({
     },
     trackName() {
       return this.getTrackName(this.currentTrack);
+    },
+    mediaByView() {
+      if (this.$data.libraryView === LIBRARY_VIEWS.TRACKS) {
+        return this.$data.media;
+      }
+
+      // todo: the others
     },
   },
 });

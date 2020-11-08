@@ -22,14 +22,17 @@
             </div>
             <div class="xf-library-area">
                 <label class="xf-search">
-                    <span class="xf-search-label">Search library:</span>
+                    <span class="xf-search-label">Search {{ libraryView }}:</span>
                     <input type="search" class="xf-search-box" name="q" v-on:input="handSearchQueryChanged">
                 </label>
                 <div class="xf-track-select-wrapper">
+                    <select>
+                        <option v-for="(value, key) in constants.LIBRARY_VIEWS" v-once :value="key">Show {{ value }}</option>
+                    </select>
                     <h3>Select track:</h3>
                     <div class="xf-track-select">
                         <button
-                                v-for="track in media"
+                                v-for="track in mediaByView"
                                 class="xf-track-select-button"
                                 v-bind:data-value="track.file"
                                 v-on:click="handleTrackButtonPressed(track)"

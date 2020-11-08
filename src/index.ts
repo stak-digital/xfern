@@ -1,5 +1,3 @@
-import { readdir } from "fs/promises";
-import { join } from "path";
 import { boot as bootUI } from "./ui";
 import { boot as bootAPI } from "./api";
 

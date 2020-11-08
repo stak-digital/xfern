@@ -3,11 +3,34 @@ import { join } from "path";
 import cors from "cors";
 import glob from "glob";
 import { parseFile } from "music-metadata";
+import bodyParser from "body-parser";
+
+const getPlugins = async () => {
+  const pluginFiles: string[] = await new Promise((resolve, reject) => {
+    glob(
+      join(process.cwd(), "plugins", "*.js"),
+      { dot: false },
+      (err, matches) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(matches);
+      }
+    );
+  });
+
+  const modules = await Promise.all(
+    pluginFiles.map((pluginFile) => import(pluginFile))
+  );
+  return modules.map((module) => module.default); // the default export should match the signature specified in the plugin Spec
+};
 
 const getMedia = async (): Promise<Array<string>> => {
   return new Promise((resolve, reject) => {
     glob(
-      join(process.cwd(), "media", "**/**.*(mp3|wav|aiff)"),
+      join(process.cwd(), "media", "**/**.*(mp3|wav|aiff|m4a)"),
       { dot: false },
       (err, matches) => {
         if (err) {
@@ -54,8 +77,17 @@ export const boot = async () => {
   let media = [];
 
   app.use(cors());
+  app.use(bodyParser());
 
   app.use("/media/file", express.static("media"));
+
+  app.post("/event", async (req, res) => {
+    console.log("Received event: ", req.body);
+    const { name, data } = req.body;
+    plugins.forEach(({ handleEvent }) => {
+      handleEvent(name, data);
+    });
+  });
 
   app.get("/media/all", async (req, res) => {
     const mediaFiles = media.map((mediaObject) => {
@@ -91,6 +123,10 @@ export const boot = async () => {
       };
     })
   );
+
+  console.log("Loading plugins...");
+  const plugins = await getPlugins();
+  plugins.forEach(({ name }) => console.log(`Loaded plugin "${name}"`));
 
   app.listen(port, () => {
     console.log(`API Server listening at http://localhost:${port}`);

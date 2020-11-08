@@ -75,3 +75,31 @@ yarn start
 
 This will start the xfern server on port 3000 (the UI) and port 3001 (the API).
 
+## Writing plugins
+
+xfern is an extensible media server, but you don't have to edit its source to 
+get new functionality. Instead, you can write small, independent plugins that can
+do anything you like.
+
+If you put a Javascript file into the `/plugins` folder, xfern will load it at 
+bootup and will invoke the plugin's handler function will any events that the
+server generates (eg: `start-track`, `do-search`).
+
+Your plugin code can do anything it likes -- xfern's functionality is limited 
+only by your imagination.
+
+Here is an example of what should go in your plugin file:
+
+```javascript
+// myPlugin.js
+
+const handleEvent = (eventName, data) => {
+    console.log('Received event: ', eventName);
+    console.log('Received data: ', data);
+}
+
+export default {
+    name: 'My Plugin',
+    handler: handleEvent
+}
+```
