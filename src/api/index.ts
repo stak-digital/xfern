@@ -77,12 +77,11 @@ export const boot = async () => {
   let media = [];
 
   app.use(cors());
-  app.use(bodyParser());
+  app.use(bodyParser({ extended: true }));
 
   app.use("/media/file", express.static("media"));
 
   app.post("/event", async (req, res) => {
-    console.log("Received event: ", req.body);
     const { name, data } = req.body;
     plugins.forEach((plugin) => {
       plugin.handler(name, data);

@@ -143,3 +143,8 @@ audio {
     flex-grow: 0;
     margin-right: 1rem;
 }
+
+.xf-track-select-button[data-is-current-track] {
+    background: var(--color-foreground);
+    color: var(--color-background);
+}
