@@ -8,29 +8,37 @@
     <link rel="stylesheet" href="/public/skin.css">
     <script src="/public/script.js" type="module" async defer></script>
 </head>
-<body class="xf-body">
-    <h1 class="xf-title">🌿 xfern Music Server</h1>
-    <main class="xf-root">
-        <h2 class="xf-current-track-label">Current Track: <code class="xf-current-track-name">{{ trackName }}</code></h2>
-        <nav>
-            <button class="xf-play-or-pause" v-on:click="handlePlayPauseButtonPressed">Play/Pause</button>
-        </nav>
-        <audio class="xf-player" controls v-bind:src="trackSrc" ref="audio"></audio>
-        <label>
-            Search library:
-            <input type="search" class="xf-search-box" name="q" v-on:input="handSearchQueryChanged">
-        </label>
-        <div class="xf-track-select-wrapper">
-            <h3>Select track:</h3>
-            <div class="xf-track-select">
-                <button
-                    v-for="track in media"
-                    class="xf-track-select-button"
-                    v-bind:data-value="track.file"
-                    v-on:click="handleTrackButtonPressed(track)"
-                >{{ getTrackName(track) }}</button>
+<body>
+    <div class="xf-body">
+        <h1 class="xf-title">🌿 xfern Music Server (TODO: add mobile layout)</h1>
+        <main class="xf-root">
+            <div class="xf-player-area">
+                <h2 class="xf-current-track-label">Current Track: <code class="xf-current-track-name">{{ trackName }}</code>
+                </h2>
+                <nav>
+                    <button class="xf-play-or-pause" v-on:click="handlePlayPauseButtonPressed">Play/Pause</button>
+                </nav>
+                <audio class="xf-player" controls v-bind:src="trackSrc" ref="audio"></audio>
             </div>
-        </div>
-    </main>
+            <div class="xf-library-area">
+                <label class="xf-search">
+                    <span class="xf-search-label">Search library:</span>
+                    <input type="search" class="xf-search-box" name="q" v-on:input="handSearchQueryChanged">
+                </label>
+                <div class="xf-track-select-wrapper">
+                    <h3>Select track:</h3>
+                    <div class="xf-track-select">
+                        <button
+                                v-for="track in media"
+                                class="xf-track-select-button"
+                                v-bind:data-value="track.file"
+                                v-on:click="handleTrackButtonPressed(track)"
+                        >{{ getTrackName(track) }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

@@ -24,6 +24,8 @@ body {
 }
 
 .xf-title {
+    flex-grow: 0;
+    flex-shrink: 0;
     text-align: center;
     margin: 0;
     font-size: 1rem;
@@ -77,6 +79,43 @@ main {
     content: '▶ / ⏸'
 }
 
+.xf-root {
+    display: flex;
+    flex-direction: row-reverse; /* library area on left */
+    align-items: stretch;
+    flex-grow: 1;
+}
+
+.xf-body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+audio {
+    margin-top: 1rem;
+}
+
+.xf-player-area {
+    grid-area: player;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-left: 1px solid var(--color-foreground);
+    padding: 1rem;
+    width: 400px;
+    flex-shrink: 0;
+}
+
+.xf-library-area {
+    grid-area: library;
+    overflow-y: scroll;
+    flex-shrink: 1;
+    width: 100%;
+    padding: 1rem;
+}
+
 /*.xf-play-or-pause[data-state="paused"]::before {*/
 /*    content: '▶'*/
 /*}*/
@@ -84,3 +123,24 @@ main {
 /*.xf-play-or-pause[data-state="playing"]::before {*/
 /*    content: '⏸'*/
 /*}*/
+
+.xf-search {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: center;
+    width: 100%;
+}
+
+.xf-search-box {
+    font: inherit;
+    flex-grow: 1;
+    padding: 0.5em 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.xf-search-label {
+    flex-grow: 0;
+    margin-right: 1rem;
+}
