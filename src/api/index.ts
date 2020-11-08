@@ -84,8 +84,8 @@ export const boot = async () => {
   app.post("/event", async (req, res) => {
     console.log("Received event: ", req.body);
     const { name, data } = req.body;
-    plugins.forEach(({ handleEvent }) => {
-      handleEvent(name, data);
+    plugins.forEach((plugin) => {
+      plugin.handler(name, data);
     });
   });
 
