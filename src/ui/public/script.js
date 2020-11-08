@@ -9,6 +9,7 @@ new Vue({
   data: {
     media: [],
     currentTrack: null,
+    playerState: "paused", // todo: can we just detect this on-demand instead of manually tracking?
   },
   mounted() {
     fetch(`http://${domain}:3001/media/all`)
@@ -18,8 +19,15 @@ new Vue({
         this.setTrack(firstFile);
         this.setQueue(files);
       });
+
+    // todo: add removeEventListener on unmount
+    this.$refs.audio.addEventListener("play", this.handlePlayerStateChanged);
+    this.$refs.audio.addEventListener("pause", this.handlePlayerStateChanged);
   },
   methods: {
+    handlePlayerStateChanged() {
+      this.$data.playerState = this.$refs.audio.paused ? "paused" : "playing";
+    },
     handlePlayPauseButtonPressed(e) {
       const { audio } = this.$refs;
       if (audio.paused) {
@@ -74,13 +82,6 @@ new Vue({
     },
   },
   computed: {
-    playerState() {
-      if (!this.$refs.audio) {
-        return "beh";
-      }
-
-      return this.$refs.audio.paused ? "paused" : "playing";
-    },
     trackSrc() {
       if (!this.currentTrack) {
         return "";
@@ -93,24 +94,3 @@ new Vue({
     },
   },
 });
-
-// audio.addEventListener("pause", (e) => {
-//   $(".xf-play-or-pause").dataset.state = "paused";
-// });
-//
-// audio.addEventListener("play", (e) => {
-//   $(".xf-play-or-pause").dataset.state = "playing";
-// });
-//
-// $(".xf-play-or-pause").addEventListener("click", (e) => {
-//   /**
-//    * @type {HTMLAudioElement}
-//    */
-//   const { dataset } = e.target;
-//
-//   if (dataset.state === "playing") {
-//     audio.pause();
-//   } else {
-//     audio.play();
-//   }
-// });

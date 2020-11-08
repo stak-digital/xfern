@@ -16,7 +16,7 @@
                 <h2 class="xf-current-track-label">Current Track: <code class="xf-current-track-name">{{ trackName }}</code>
                 </h2>
                 <nav>
-                    <button class="xf-play-or-pause" v-on:click="handlePlayPauseButtonPressed">Play/Pause</button>
+                    <button class="xf-play-or-pause" :data-state="playerState" v-on:click="handlePlayPauseButtonPressed">Play/Pause</button>
                 </nav>
                 <audio class="xf-player" controls v-bind:src="trackSrc" ref="audio"></audio>
             </div>
