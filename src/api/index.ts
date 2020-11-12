@@ -4,6 +4,9 @@ import cors from "cors";
 import glob from "glob";
 import { parseFile } from "music-metadata";
 import bodyParser from "body-parser";
+import fetch from "node-fetch";
+
+const port = 3001;
 
 const getPlugins = async () => {
   const pluginFiles: string[] = await new Promise((resolve, reject) => {
@@ -38,10 +41,54 @@ const getMedia = async (): Promise<Array<string>> => {
           return;
         }
 
+        console.log(1);
+
         resolve(matches);
       }
     );
-  });
+  }).then(
+    /**
+     * @param {Array<string>} matches
+     */
+    async (matches) => {
+      /**
+       * @type Array<Array>
+       */
+      let pluginResults;
+
+      try {
+        pluginResults = await fetch(`http://localhost:${port}/event`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: "find-tracks",
+            data: {
+              tracks: matches,
+            },
+          }),
+        }).then((r) => r.json());
+
+        if (Array.isArray(pluginResults)) {
+          matches = pluginResults.flat(Infinity).filter(Boolean);
+        } else {
+          throw new Error(
+            "I was expecting a response of shape Array<TrackArray|null>"
+          );
+        }
+      } catch (e) {
+        console.log("failed to do plugins", e);
+      }
+
+      if (Array.isArray(matches)) {
+        return matches;
+      } else {
+        return [];
+      }
+    }
+  );
 };
 
 const parseMetaData = (filePath): Promise<any> => {
@@ -73,7 +120,6 @@ const makeFilePath = (file) => {
 
 export const boot = async () => {
   const app = express();
-  const port = 3001;
   let media = [];
 
   app.use(cors());
@@ -83,9 +129,13 @@ export const boot = async () => {
 
   app.post("/event", async (req, res) => {
     const { name, data } = req.body;
-    plugins.forEach((plugin) => {
-      plugin.handler(name, data);
-    });
+    res.json(
+      await Promise.all(
+        plugins
+          .filter((plugin) => plugin.active !== false)
+          .map((plugin) => plugin.handler(name, data))
+      )
+    );
   });
 
   app.get("/media/all", async (req, res) => {
@@ -100,7 +150,17 @@ export const boot = async () => {
 
   app.get("/media/search", async (req, res) => {
     const search = req.query.q as string;
-    const matches = media
+    let foundMedia: any = await getMedia();
+    console.log({ foundMedia });
+    foundMedia = await Promise.all(
+      foundMedia.map(async (file) => {
+        return {
+          file,
+          meta: await parseMetaData(file),
+        };
+      })
+    );
+    const matches = foundMedia
       .filter((mediaObject) =>
         mediaObject.file.toLowerCase().includes(search.toLocaleLowerCase())
       )
