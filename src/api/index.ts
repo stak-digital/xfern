@@ -71,6 +71,11 @@ export const boot = async () => {
     res.status(200).json(pluginResults);
   });
 
+  app.get("/meta/version", async (req, res) => {
+    const pkg = require("../../package.json");
+    return res.status(200).send(pkg.version);
+  });
+
   app.get("/media/search", async (req, res) => {
     const search = req.query.q as string;
     let foundMedia: any = await getMedia();
