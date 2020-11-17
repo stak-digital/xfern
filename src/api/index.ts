@@ -4,6 +4,9 @@ import cors from "cors";
 import glob from "glob";
 import { parseFile } from "music-metadata";
 import bodyParser from "body-parser";
+import { getMedia } from "./media";
+import { port } from "./constants";
+import { makeFilePath } from "./file";
 
 const getPlugins = async () => {
   const pluginFiles: string[] = await new Promise((resolve, reject) => {
@@ -27,53 +30,15 @@ const getPlugins = async () => {
   return modules.map((module) => module.default); // the default export should match the signature specified in the plugin Spec
 };
 
-const getMedia = async (): Promise<Array<string>> => {
-  return new Promise((resolve, reject) => {
-    glob(
-      join(process.cwd(), "media", "**/**.*(mp3|wav|aiff|m4a)"),
-      { dot: false },
-      (err, matches) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(matches);
-      }
-    );
-  });
-};
-
 const parseMetaData = (filePath): Promise<any> => {
   return parseFile(filePath, {
     skipCovers: true,
     skipPostHeaders: true,
   });
-  //     onError: ({ info }) => {
-  //       // you cannot read tags on a WAV file so it throws with this error
-  //       if (info === "No suitable tag reader found") {
-  //         const fakeTags: TagType = {
-  //           tags: {},
-  //           type: "unknown",
-  //         };
-  //         resolve(fakeTags);
-  //         return;
-  //       }
-  //
-  //       reject(new Error(info));
-  //     },
-  //   });
-};
-
-const makeFilePath = (file) => {
-  return `/media/file/${file
-    .replace(process.cwd(), "")
-    .replace("/media/", "")}`;
 };
 
 export const boot = async () => {
   const app = express();
-  const port = 3001;
   let media = [];
 
   app.use(cors());
@@ -100,7 +65,16 @@ export const boot = async () => {
 
   app.get("/media/search", async (req, res) => {
     const search = req.query.q as string;
-    const matches = media
+    let foundMedia: any = await getMedia();
+    foundMedia = await Promise.all(
+      foundMedia.map(async (file) => {
+        return {
+          file,
+          meta: await parseMetaData(file),
+        };
+      })
+    );
+    const matches = foundMedia
       .filter((mediaObject) =>
         mediaObject.file.toLowerCase().includes(search.toLocaleLowerCase())
       )
@@ -112,16 +86,6 @@ export const boot = async () => {
       });
     res.json(matches);
   });
-
-  media = await getMedia();
-  media = await Promise.all(
-    media.map(async (file) => {
-      return {
-        file,
-        meta: await parseMetaData(file),
-      };
-    })
-  );
 
   console.log("Loading plugins...");
   const plugins = await getPlugins();
