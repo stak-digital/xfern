@@ -49,7 +49,12 @@ export const getMedia = async (): Promise<Array<string>> => {
         }).then((r) => r.json());
 
         if (Array.isArray(pluginResults)) {
-          matches = pluginResults.flat(Infinity).filter(Boolean);
+          const matchesAlteredByPlugins = pluginResults
+            .flat(Infinity)
+            .filter(Boolean);
+          if (matchesAlteredByPlugins.length) {
+            matches = matchesAlteredByPlugins;
+          }
         } else {
           throw new Error(
             "I was expecting a response of shape Array<TrackArray|null>"
@@ -58,6 +63,8 @@ export const getMedia = async (): Promise<Array<string>> => {
       } catch (e) {
         console.log("failed to do plugins", e);
       }
+
+      console.log(matches);
 
       if (Array.isArray(matches)) {
         return matches;

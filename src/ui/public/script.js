@@ -42,7 +42,7 @@ window.zz = new Vue({
     return initialState;
   },
   mounted() {
-    fetch(`http://${domain}:3001/media/all`)
+    fetch(`http://${domain}:3001/media/search?q=`)
       .then((res) => res.json())
       .then((files) => {
         if (!this.currentTrack) {

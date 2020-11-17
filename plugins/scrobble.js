@@ -12,8 +12,9 @@
 /**
  * @param {string} eventName
  * @param {any} data
+ * @return Promise<any>
  */
-const handleEvent = (eventName, data) => {
+const handleEvent = async (eventName, data) => {
   if (eventName === "start-track") {
     const lastFM_API_payload = {
       artist: data.track.meta.common.artist,

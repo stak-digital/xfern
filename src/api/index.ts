@@ -39,7 +39,6 @@ const parseMetaData = (filePath): Promise<any> => {
 
 export const boot = async () => {
   const app = express();
-  let media = [];
 
   app.use(cors());
   app.use(bodyParser({ extended: true }));
@@ -48,19 +47,28 @@ export const boot = async () => {
 
   app.post("/event", async (req, res) => {
     const { name, data } = req.body;
-    plugins.forEach((plugin) => {
-      plugin.handler(name, data);
-    });
-  });
 
-  app.get("/media/all", async (req, res) => {
-    const mediaFiles = media.map((mediaObject) => {
-      return {
-        ...mediaObject,
-        file: makeFilePath(mediaObject.file),
-      };
+    if (!name) {
+      res.status(401).json({
+        error: "Missing parameter name",
+      });
+      return;
+    }
+
+    if (!data) {
+      res.status(401).json({
+        error: "Missing parameter data",
+      });
+      return;
+    }
+
+    const pluginResultsPromises = plugins.map((plugin) => {
+      return plugin.handler(name, data);
     });
-    res.json(mediaFiles);
+
+    const pluginResults = await Promise.all(pluginResultsPromises);
+
+    res.status(200).json(pluginResults);
   });
 
   app.get("/media/search", async (req, res) => {
@@ -75,9 +83,15 @@ export const boot = async () => {
       })
     );
     const matches = foundMedia
-      .filter((mediaObject) =>
-        mediaObject.file.toLowerCase().includes(search.toLocaleLowerCase())
-      )
+      .filter((mediaObject) => {
+        if (!search) {
+          return true;
+        } else {
+          return mediaObject.file
+            .toLowerCase()
+            .includes(search.toLocaleLowerCase());
+        }
+      })
       .map((mediaObject) => {
         return {
           ...mediaObject,
@@ -88,7 +102,10 @@ export const boot = async () => {
   });
 
   console.log("Loading plugins...");
-  const plugins = await getPlugins();
+  const plugins: Array<{
+    name: string;
+    handler: (eventName: string, data: any) => Promise<any>;
+  }> = await getPlugins();
   plugins.forEach(({ name }) => console.log(`Loaded plugin "${name}"`));
 
   app.listen(port, () => {
