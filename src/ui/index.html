@@ -9,9 +9,11 @@
     <script src="/public/script.js" type="module" async defer></script>
 </head>
 <body>
-    <div class="xf-body">
-        <h1 class="xf-title">🌿 xfern Music Server (TODO: add mobile layout)</h1>
-        <main class="xf-root">
+    <div class="xf-body xf-root">
+        <header class="xf-header">
+            <h1 class="xf-title">🌿 xfern v{{appVersion}}</h1>
+        </header>
+        <main class="xf-main">
             <div class="xf-player-area">
                 <h2 class="xf-current-track-label">Current Track: <code class="xf-current-track-name">{{ trackName }}</code>
                 </h2>

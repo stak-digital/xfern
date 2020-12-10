@@ -25,6 +25,7 @@ window.zz = new Vue({
       constants: {
         LIBRARY_VIEWS,
       },
+      appVersion: null,
     };
 
     try {
@@ -42,7 +43,13 @@ window.zz = new Vue({
     return initialState;
   },
   mounted() {
-    fetch(`http://${domain}:3001/media/all`)
+    fetch(`http://${domain}:3001/meta/version`)
+      .then((r) => r.text())
+      .then((version) => {
+        this.$set(this, "appVersion", version);
+      });
+
+    fetch(`http://${domain}:3001/media/search?q=`)
       .then((res) => res.json())
       .then((files) => {
         if (!this.currentTrack) {
